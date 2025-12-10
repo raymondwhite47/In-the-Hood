@@ -1,0 +1,12 @@
+# This file tracks properties of this Flutter project.
+# This file was generated manually because Flutter tooling was unavailable.
+version:
+  revision: manual
+  channel: manual
+project_type: app
+
+migration:
+  platforms:
+    - platform: root
+      create_revision: manual
+      base_revision: manual
