@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Lightweight Flutter wrapper that downloads a pinned SDK locally if missing.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${SCRIPT_DIR%/tool}"
+SDK_VERSION="${FLUTTER_VERSION:-3.19.6}"
+SDK_PARENT="${PROJECT_ROOT}/.flutter-sdk"
+SDK_DIR="${SDK_PARENT}/${SDK_VERSION}"
+DEFAULT_BIN="${SDK_DIR}/flutter/bin/flutter"
+CUSTOM_SDK="${FLUTTER_SDK_PATH:-}"
+
+if [[ -n "${CUSTOM_SDK}" ]]; then
+  FLUTTER_BIN="${CUSTOM_SDK%/}/bin/flutter"
+else
+  FLUTTER_BIN="${DEFAULT_BIN}"
+fi
+
+ensure_flutter() {
+  if [[ -x "${FLUTTER_BIN}" ]]; then
+    return
+  fi
+
+  if [[ -n "${CUSTOM_SDK}" ]]; then
+    if [[ ! -x "${FLUTTER_BIN}" ]]; then
+      echo "FLUTTER_SDK_PATH is set to '${CUSTOM_SDK}' but no flutter binary was found." >&2
+      exit 1
+    fi
+    return
+  fi
+
+  mkdir -p "${SDK_PARENT}" "${SDK_DIR}"
+  tmpdir="$(mktemp -d)"
+  archive="flutter_linux_${SDK_VERSION}-stable.tar.xz"
+  base_url="${FLUTTER_STORAGE_BASE_URL:-https://storage.googleapis.com/flutter_infra_release/releases}"
+  url="${base_url}/stable/linux/${archive}"
+
+  echo "Downloading Flutter ${SDK_VERSION}..." >&2
+  if ! curl -fL "${url}" -o "${tmpdir}/flutter.tar.xz"; then
+    echo "Failed to download Flutter from ${url}." >&2
+    echo "Set FLUTTER_STORAGE_BASE_URL to a reachable mirror or FLUTTER_SDK_PATH to an existing SDK." >&2
+    rm -rf "${tmpdir}"
+    exit 1
+  fi
+
+  tar -xJf "${tmpdir}/flutter.tar.xz" -C "${tmpdir}"
+  mv "${tmpdir}/flutter" "${SDK_DIR}/flutter"
+  rm -rf "${tmpdir}"
+}
+
+ensure_flutter
+export PATH="${FLUTTER_BIN%/bin/flutter}/bin:${PATH}"
+exec "${FLUTTER_BIN}" "$@"
