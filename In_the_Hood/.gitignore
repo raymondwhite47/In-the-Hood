@@ -82,3 +82,6 @@ coverage/
 **/android/app/google-services.json
 **/ios/Runner/GoogleService-Info.plist
 **/macos/Runner/GoogleService-Info.plist
+
+# Local Flutter SDK cache
+.flutter-sdk/
