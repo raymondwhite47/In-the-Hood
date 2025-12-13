@@ -7,6 +7,10 @@ import 'screens/profile/verification_screen.dart';
 import 'services/auction_service.dart';
 import 'services/chat_service.dart';
 import 'services/trust_service.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/signup_screen.dart';
+import 'screens/home/home_screen.dart';
+import 'utils/app_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -166,6 +170,13 @@ class _FeatureCard extends StatelessWidget {
           ],
         ),
       ),
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      home: const HomeScreen(),
+      routes: <String, WidgetBuilder>{
+        '/login': (_) => const LoginScreen(),
+        '/signup': (_) => const SignupScreen(),
+      },
     );
   }
 }
