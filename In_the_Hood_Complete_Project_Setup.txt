@@ -1,0 +1,161 @@
+
+🏗️ IN THE HOOD — COMPLETE PROJECT SETUP (PHASES 1–4)
+=====================================================
+
+This master file contains the entire build blueprint for the "In the Hood" app:
+A hyperlocal social marketplace with AI, gamification, and monetization layers.
+
+------------------------------------------------------
+📜 PHASE 1 — CORE APP STRUCTURE + FIREBASE + ADMOB
+------------------------------------------------------
+- Firebase integration (Auth, Firestore, Storage)
+- AdMob setup (Banner + Rewarded ads)
+- Basic UI with user login and home page
+- File structure and code skeleton in Flutter
+
+Key files:
+- lib/main.dart
+- lib/constants/admob_ids.dart
+- lib/widgets/banner_ad_widget.dart
+- android/app/src/main/AndroidManifest.xml
+- pubspec.yaml
+
+------------------------------------------------------
+📜 PHASE 2 — LISTINGS + MAP + IMAGE UPLOAD
+------------------------------------------------------
+- Add Firestore listing model
+- Google Maps integration
+- Image picker + Firebase Storage upload
+- Create and view listings on map
+
+Key files:
+- lib/models/listing_model.dart
+- lib/services/listing_service.dart
+- lib/services/location_service.dart
+- lib/screens/home/add_listing_screen.dart
+- lib/screens/home/map_screen.dart
+
+------------------------------------------------------
+📜 PHASE 3 — CHAT + AUCTIONS + VERIFIED USERS
+------------------------------------------------------
+- Real-time chat with Firestore subcollections
+- Auction system with live bid updates
+- Trust score for verified users
+- Firebase Messaging notifications
+
+Key files:
+- lib/models/message_model.dart
+- lib/models/auction_model.dart
+- lib/services/chat_service.dart
+- lib/services/auction_service.dart
+- lib/services/trust_service.dart
+- lib/services/notification_service.dart
+- lib/screens/chat/chat_screen.dart
+
+------------------------------------------------------
+📜 PHASE 4 — AI MODERATION + HOOD POINTS + BUSINESS ADS
+------------------------------------------------------
+- OpenAI moderation integration for posts and chat
+- Hood Points system (user engagement gamification)
+- HoodCoins digital economy (in-app currency)
+- Business Ads & Sponsorship system for monetization
+
+Key files:
+- lib/services/ai_moderation_service.dart
+- lib/services/points_service.dart
+- lib/services/hoodcoin_service.dart
+- lib/services/ads_service.dart
+- lib/models/points_model.dart
+- lib/models/business_ad_model.dart
+- lib/screens/rewards/wallet_screen.dart
+- lib/screens/business/post_ad_screen.dart
+
+------------------------------------------------------
+💰 MONETIZATION OVERVIEW
+------------------------------------------------------
+1. **AdMob Ads**
+   - Banner (always visible)
+   - Rewarded Ads (watch-to-boost or earn coins)
+
+2. **HoodCoins**
+   - Earned via actions or watching ads
+   - Spent on boosts or featured listings
+
+3. **Sponsored Business Ads**
+   - Paid local ad placements
+   - Premium options via HoodCoins or real payments
+
+4. **Premium Membership**
+   - Verified badge, ad-free experience, double listing reach
+
+------------------------------------------------------
+🧠 AI FEATURES OVERVIEW
+------------------------------------------------------
+- OpenAI-powered moderation (toxic content filtering)
+- AI Trust Score (user reliability metric)
+- HoodBot (Phase 5 upcoming): local assistant & insights engine
+
+------------------------------------------------------
+🎮 GAMIFICATION OVERVIEW
+------------------------------------------------------
+- Hood Points leaderboard system
+- Levels and achievements: “New in the Hood” → “Neighborhood Hero”
+- Points = Engagement currency
+- Conversion to HoodCoins via in-app exchange
+
+------------------------------------------------------
+📈 PROJECT STRUCTURE SUMMARY
+------------------------------------------------------
+In_the_Hood/
+│
+├── android/ (Firebase, AdMob config)
+├── ios/ (iOS Firebase setup)
+├── lib/
+│   ├── models/
+│   ├── services/
+│   ├── screens/
+│   ├── widgets/
+│   ├── utils/
+│   └── constants/
+├── assets/
+│   ├── icons/
+│   ├── images/
+│   └── fonts/
+├── pubspec.yaml
+├── firebase.json
+└── README.md
+
+------------------------------------------------------
+✅ COMPLETED FEATURES BY PHASE
+------------------------------------------------------
+| Phase | Feature Set | Status |
+|--------|--------------|--------|
+| 1 | Firebase + AdMob + Core UI | ✅ Done |
+| 2 | Listings + Map + Upload | ✅ Done |
+| 3 | Chat + Auctions + Trust Score | ✅ Done |
+| 4 | AI + HoodCoins + Ads | ✅ Done |
+| 5 | HoodBot + Personal Feed + Referrals | 🚧 Next |
+
+------------------------------------------------------
+🚀 NEXT PHASE (PHASE 5 — COMING UP)
+------------------------------------------------------
+- 🤖 HoodBot AI assistant (GPT-powered local helper)
+- 🧭 Personalized AI feed (smart local recommendations)
+- 📈 Admin dashboard with analytics & user insights
+- 🎁 Referral & influencer programs
+- 💬 Local event integration with monetized ads
+
+------------------------------------------------------
+🔮 VISION
+------------------------------------------------------
+"In the Hood" will be the world’s first **AI-driven neighborhood ecosystem** —
+connecting users, businesses, and communities through trust, trade, and tech.
+
+------------------------------------------------------
+👨‍💻 AUTHOR NOTE
+------------------------------------------------------
+All architecture and code structure follow:
+- Scalable MVVM pattern in Flutter
+- Firebase BaaS for backend
+- AdMob + OpenAI API for monetization & safety
+- Designed for Android-first, iOS compatible later
