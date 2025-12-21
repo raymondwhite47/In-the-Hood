@@ -20,6 +20,7 @@ dependencies:
   google_mobile_ads: ^4.0.0
   provider: ^7.0.0
   geolocator: ^10.0.0
+  google_fonts: ^6.2.1
   image_picker: ^1.1.1
   cupertino_icons: ^1.0.6
   firebase_core: ^2.31.0
@@ -32,3 +33,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
