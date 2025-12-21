@@ -1,108 +1,176 @@
 import 'package:flutter/material.dart';
-
-import 'screens/auction/auction_details_screen.dart';
-import 'screens/auction/create_auction_screen.dart';
-import 'screens/chat/chat_list_screen.dart';
-import 'screens/profile/verification_screen.dart';
-import 'services/auction_service.dart';
-import 'services/chat_service.dart';
-import 'services/trust_service.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/auth/signup_screen.dart';
-import 'screens/home/home_screen.dart';
-import 'utils/app_theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const InTheHood());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class InTheHood extends StatelessWidget {
+  const InTheHood({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'In the Hood',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: const Color(0xFF0B0C10),
       ),
-      home: const HomeScreen(),
+      home: const OnboardingScreen1(),
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+// === ONBOARDING SCREEN 1 (SPLASH / INTRO) ===
 
-  final ChatService _chatService = ChatService();
-  final AuctionService _auctionService = AuctionService();
-  final TrustService _trustService = TrustService();
+class OnboardingScreen1 extends StatelessWidget {
+  const OnboardingScreen1({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final sampleAuction = _auctionService.fetchAuctions().first;
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('In the Hood'),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _FeatureCard(
-            title: 'Chats',
-            description: 'Talk with neighbors and stay updated on local happenings.',
-            icon: Icons.chat_bubble_outline,
-            actionLabel: 'View chats',
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => ChatListScreen(chatService: _chatService),
-                ),
-              );
-            },
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.center,
+            radius: 1.2,
+            colors: [Color(0xFF00FFFF), Color(0xFF0B0C10)],
           ),
-          const SizedBox(height: 12),
-          _FeatureCard(
-            title: 'Auctions',
-            description: 'Create auctions and place bids on local deals.',
-            icon: Icons.gavel,
-            actionLabel: 'View featured auction',
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => AuctionDetailsScreen(
-                    auction: sampleAuction,
-                    auctionService: _auctionService,
-                  ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Embossed Neon Logo
+              Text(
+                'In the Hood',
+                style: GoogleFonts.orbitron(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  foreground: Paint()
+                    ..shader = const LinearGradient(
+                      colors: [Color(0xFF00FFFF), Color(0xFFFF00FF)],
+                    ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
+                  shadows: const [
+                    Shadow(
+                      color: Color(0xFF00FFFF),
+                      blurRadius: 20,
+                      offset: Offset(0, 0),
+                    ),
+                  ],
                 ),
-              );
-            },
-            trailingAction: TextButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => CreateAuctionScreen(auctionService: _auctionService),
-                  ),
-                );
-              },
-              child: const Text('Create auction'),
+              ),
+              const SizedBox(height: 30),
+              Text(
+                'The AI-powered local marketplace\nwhere trust meets trade.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  color: Colors.white.withOpacity(0.8),
+                ),
+              ),
+              const SizedBox(height: 80),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.cyanAccent,
+                size: 32,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// === ONBOARDING SCREEN 2 (NEIGHBORHOOD MAP) ===
+
+class OnboardingScreen2 extends StatelessWidget {
+  const OnboardingScreen2({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Grayscale map (placeholder image)
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/logo.png'),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-          const SizedBox(height: 12),
-          _FeatureCard(
-            title: 'Verification',
-            description: 'Boost your trust score with quick identity verification.',
-            icon: Icons.verified_user,
-            actionLabel: 'Start verification',
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => VerificationScreen(trustService: _trustService),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Colors.black.withOpacity(0.7),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Discover what's happening\nin your neighborhood.",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.orbitron(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: const [
+                      Shadow(color: Color(0xFF00FFFF), blurRadius: 10),
+                    ],
+                  ),
                 ),
-              );
-            },
+                const SizedBox(height: 16),
+                Text(
+                  'Events, sales, and stories — all verified by AI.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00FFFF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 48,
+                      vertical: 14,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    'Allow Location Access',
+                    style: GoogleFonts.orbitron(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -110,73 +178,21 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _FeatureCard extends StatelessWidget {
-  const _FeatureCard({
-    required this.title,
-    required this.description,
-    required this.icon,
-    required this.actionLabel,
-    required this.onTap,
-    this.trailingAction,
-  });
+// === HOME PLACEHOLDER ===
 
-  final String title;
-  final String description;
-  final IconData icon;
-  final String actionLabel;
-  final VoidCallback onTap;
-  final Widget? trailingAction;
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(icon, size: 28, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        description,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ),
-                if (trailingAction != null) trailingAction!,
-              ],
-            ),
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: onTap,
-                child: Text(actionLabel),
-              ),
-            ),
-          ],
+    return const Scaffold(
+      backgroundColor: Color(0xFF0B0C10),
+      body: Center(
+        child: Text(
+          'Welcome to In the Hood',
+          style: TextStyle(color: Colors.white, fontSize: 22),
         ),
       ),
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: const HomeScreen(),
-      routes: <String, WidgetBuilder>{
-        '/login': (_) => const LoginScreen(),
-        '/signup': (_) => const SignupScreen(),
-      },
     );
   }
 }
