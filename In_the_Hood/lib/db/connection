@@ -1,0 +1,29 @@
+import 'package:postgres/postgres.dart';
+
+class DatabaseConnection {
+  static final DatabaseConnection _instance = DatabaseConnection._internal();
+  late PostgreSQLConnection connection;
+
+  factory DatabaseConnection() {
+    return _instance;
+  }
+
+  DatabaseConnection._internal();
+
+  Future<void> open() async {
+    connection = PostgreSQLConnection(
+      'in-the-hood-db-rawdriver47-in-the-hood.k.aivencloud.com', // Your Aiven host
+      22650, // Your specified port
+      'your-database-name', // Your database name
+      username: 'your-username', // Your username
+      password: 'your-password', // Your password
+      useSSL: true,
+    );
+
+    await connection.open();
+  }
+
+  Future<void> close() async {
+    await connection.close();
+  }
+}
