@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../models/auction_model.dart';
 import '../../services/auction_service.dart';
+import '../../widgets/dynamic_background.dart';
 
 class AuctionDetailsScreen extends StatefulWidget {
   const AuctionDetailsScreen({super.key, required this.auction, required this.auctionService});
