@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/user_model.dart';
+import 'wallet_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -42,6 +43,21 @@ class ProfileScreen extends StatelessWidget {
                 title: const Text('Hood Points'),
                 subtitle: const Text('Earn points for helping neighbors and staying active.'),
                 trailing: Text(user.hoodPoints.toString()),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Card(
+              child: ListTile(
+                title: const Text('HoodCoin Wallet'),
+                subtitle: const Text('Track your HoodCoins balance and rewards.'),
+                trailing: const Icon(Icons.account_balance_wallet_outlined),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => WalletScreen(userId: user.id),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 10),
