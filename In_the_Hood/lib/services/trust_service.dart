@@ -1,15 +1,18 @@
-class TrustService {
-  TrustService();
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-  Future<double> calculateTrustScore({required int verifications, required int positiveReviews}) async {
-    await Future<void>.delayed(const Duration(milliseconds: 150));
-    final baseScore = 50.0 + verifications * 10;
-    final reviewBonus = positiveReviews * 2;
-    return (baseScore + reviewBonus).clamp(0, 100).toDouble();
+class TrustService {
+  final usersRef = FirebaseFirestore.instance.collection('users');
+
+  Future<double> calculateTrust(String userId) async {
+    final userDoc = await usersRef.doc(userId).get();
+    final trades = userDoc['completedTrades'] ?? 0;
+    final reports = userDoc['reports'] ?? 0;
+    double score = (50 + (trades * 5) - (reports * 10)).toDouble();
+    return score.clamp(0, 100);
   }
 
-  Future<bool> verifyUser({required String fullName, required String documentId}) async {
-    await Future<void>.delayed(const Duration(milliseconds: 300));
-    return fullName.isNotEmpty && documentId.isNotEmpty;
+  Future<void> updateTrust(String userId) async {
+    final score = await calculateTrust(userId);
+    await usersRef.doc(userId).update({'trustScore': score});
   }
 }
