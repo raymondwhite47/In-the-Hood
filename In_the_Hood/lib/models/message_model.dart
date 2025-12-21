@@ -1,35 +1,33 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class MessageModel {
-  const MessageModel({
-    required this.id,
-    required this.chatId,
-    required this.sender,
+  final String senderId;
+  final String receiverId;
+  final String content;
+  final Timestamp timestamp;
+
+  MessageModel({
+    required this.senderId,
+    required this.receiverId,
     required this.content,
     required this.timestamp,
   });
 
-  final String id;
-  final String chatId;
-  final String sender;
-  final String content;
-  final DateTime timestamp;
-
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'chatId': chatId,
-      'sender': sender,
+      'senderId': senderId,
+      'receiverId': receiverId,
       'content': content,
-      'timestamp': timestamp.toIso8601String(),
+      'timestamp': timestamp,
     };
   }
 
-  factory MessageModel.fromJson(Map<String, dynamic> json) {
+  factory MessageModel.fromMap(Map<String, dynamic> data) {
     return MessageModel(
-      id: json['id'] as String,
-      chatId: json['chatId'] as String,
-      sender: json['sender'] as String,
-      content: json['content'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      senderId: data['senderId'],
+      receiverId: data['receiverId'],
+      content: data['content'],
+      timestamp: data['timestamp'],
     );
   }
 }

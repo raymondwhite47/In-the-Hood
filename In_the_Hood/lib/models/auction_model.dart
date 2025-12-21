@@ -1,63 +1,41 @@
-class AuctionModel {
-  const AuctionModel({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.startingBid,
-    required this.currentBid,
-    required this.endsAt,
-    this.isActive = true,
-  });
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+class AuctionModel {
   final String id;
   final String title;
-  final String description;
-  final double startingBid;
   final double currentBid;
-  final DateTime endsAt;
-  final bool isActive;
+  final double minIncrement;
+  final Timestamp endTime;
+  final String sellerId;
+  final String highestBidderId;
 
-  AuctionModel copyWith({
-    String? id,
-    String? title,
-    String? description,
-    double? startingBid,
-    double? currentBid,
-    DateTime? endsAt,
-    bool? isActive,
-  }) {
-    return AuctionModel(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      startingBid: startingBid ?? this.startingBid,
-      currentBid: currentBid ?? this.currentBid,
-      endsAt: endsAt ?? this.endsAt,
-      isActive: isActive ?? this.isActive,
-    );
-  }
+  AuctionModel({
+    required this.id,
+    required this.title,
+    required this.currentBid,
+    required this.minIncrement,
+    required this.endTime,
+    required this.sellerId,
+    required this.highestBidderId,
+  });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'startingBid': startingBid,
-      'currentBid': currentBid,
-      'endsAt': endsAt.toIso8601String(),
-      'isActive': isActive,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'title': title,
+        'currentBid': currentBid,
+        'minIncrement': minIncrement,
+        'endTime': endTime,
+        'sellerId': sellerId,
+        'highestBidderId': highestBidderId,
+      };
 
-  factory AuctionModel.fromJson(Map<String, dynamic> json) {
-    return AuctionModel(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      startingBid: (json['startingBid'] as num).toDouble(),
-      currentBid: (json['currentBid'] as num).toDouble(),
-      endsAt: DateTime.parse(json['endsAt'] as String),
-      isActive: json['isActive'] as bool? ?? true,
-    );
-  }
+  factory AuctionModel.fromMap(Map<String, dynamic> data) => AuctionModel(
+        id: data['id'],
+        title: data['title'],
+        currentBid: data['currentBid'],
+        minIncrement: data['minIncrement'],
+        endTime: data['endTime'],
+        sellerId: data['sellerId'],
+        highestBidderId: data['highestBidderId'],
+      );
 }

@@ -1,0 +1,7 @@
+class Reward {
+  final String title;
+  final String description;
+  final int points;
+
+  Reward({required this.title, required this.description, required this.points});
+}
