@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class AuctionModel {
   final String id;
   final String title;
   final double currentBid;
   final double minIncrement;
-  final Timestamp endTime;
+  final DateTime endTime;
   final String sellerId;
   final String highestBidderId;
 
@@ -24,7 +22,7 @@ class AuctionModel {
         'title': title,
         'currentBid': currentBid,
         'minIncrement': minIncrement,
-        'endTime': endTime,
+        'endTime': endTime.toIso8601String(),
         'sellerId': sellerId,
         'highestBidderId': highestBidderId,
       };
@@ -34,7 +32,7 @@ class AuctionModel {
         title: data['title'],
         currentBid: data['currentBid'],
         minIncrement: data['minIncrement'],
-        endTime: data['endTime'],
+        endTime: DateTime.parse(data['endTime']),
         sellerId: data['sellerId'],
         highestBidderId: data['highestBidderId'],
       );

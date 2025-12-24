@@ -1,23 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'aws_store.dart';
 
 class PointsService {
-  final pointsRef = FirebaseFirestore.instance.collection('user_points');
+  final AwsStore _store = AwsStore.instance;
 
   Future<void> addPoints(String userId, int amount) async {
-    final doc = await pointsRef.doc(userId).get();
-    if (!doc.exists) {
-      await pointsRef.doc(userId).set({'userId': userId, 'points': amount});
-    } else {
-      await pointsRef.doc(userId).update({'points': FieldValue.increment(amount)});
-    }
+    final current = _store.get('user_points', userId)?['points'] as int? ?? 0;
+    _store.set('user_points', userId, {'userId': userId, 'points': current + amount});
   }
 
   Future<int> getPoints(String userId) async {
-    final doc = await pointsRef.doc(userId).get();
-    return doc.exists ? doc['points'] : 0;
+    return _store.get('user_points', userId)?['points'] as int? ?? 0;
   }
 
   Stream<int> watchPoints(String userId) {
-    return pointsRef.doc(userId).snapshots().map((doc) => (doc.data()?['points'] ?? 0) as int);
+    return _store.watch('user_points').map((items) {
+      final entry = items.firstWhere((item) => item['id'] == userId, orElse: () => {});
+      return entry['points'] as int? ?? 0;
+    });
   }
 }

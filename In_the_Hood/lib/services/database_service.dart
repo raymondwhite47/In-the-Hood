@@ -1,12 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:in_the_hood/models/listing_model.dart';
+import 'aws_store.dart';
 
 class DatabaseService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final AwsStore _store = AwsStore.instance;
 
   Stream<List<Listing>> getListings() {
-    return _db.collection('listings').snapshots().map((snapshot) =>
-        snapshot.docs.map((doc) => Listing.fromFirestore(doc)).toList());
+    return _store.watch('listings').map(
+          (items) => items.map((data) => Listing.fromMap(data, data['id'] as String)).toList(),
+        );
   }
 
   Future<void> addListing({
@@ -16,26 +17,23 @@ class DatabaseService {
     required String imageUrl,
     required String userId,
   }) {
-    return _db.collection('listings').add({
+    _store.add('listings', {
       'title': title,
       'description': description,
       'price': price,
       'imageUrl': imageUrl,
       'userId': userId,
+      'location': const LocationPoint(latitude: 0, longitude: 0).toMap(),
+      'createdAt': DateTime.now().toIso8601String(),
     });
+    return Future.value();
   }
 
   Future<Map<String, int>> getAnalytics() async {
-    final usersQuery = _db.collection('users').count().get();
-    final listingsQuery = _db.collection('listings').count().get();
-    final transactionsQuery = _db.collection('transactions').count().get();
-
-    final results = await Future.wait([usersQuery, listingsQuery, transactionsQuery]);
-
     return {
-      'users': results[0].count ?? 0,
-      'listings': results[1].count ?? 0,
-      'transactions': results[2].count ?? 0,
+      'users': _store.list('users').length,
+      'listings': _store.list('listings').length,
+      'transactions': _store.list('transactions').length,
     };
   }
 }

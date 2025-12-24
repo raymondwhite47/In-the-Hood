@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -7,13 +10,19 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'amplifyconfiguration.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const InTheHoodApp());
 }
 
-class InTheHoodApp extends StatefulWidget {
-  const InTheHoodApp({super.key});
+Future<void> _configureAmplify() async {
+  if (Amplify.isConfigured) {
+    return;
+  }
+
+  final api = AmplifyAPI();
+  final auth = AmplifyAuthCognito();
+  final storage = AmplifyStorageS3();
 
   @override
   State<InTheHoodApp> createState() => _InTheHoodAppState();
@@ -23,49 +32,14 @@ class _InTheHoodAppState extends State<InTheHoodApp> {
   late final Future<void> _amplifyInit;
 
   @override
-  void initState() {
-    super.initState();
-    _amplifyInit = _configureAmplify();
-  }
-
-  Future<void> _configureAmplify() async {
-    if (Amplify.isConfigured) {
-      return;
-    }
-
-    final api = AmplifyAPI();
-    final auth = AmplifyAuthCognito();
-    final storage = AmplifyStorageS3();
-
-    await Amplify.addPlugins([api, auth, storage]);
-    await Amplify.configure(amplifyconfig);
-    safePrint('✅ Amplify successfully configured');
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _amplifyInit,
-      builder: (context, snapshot) {
-        final hasError = snapshot.hasError;
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'In the Hood',
-          theme: ThemeData.dark().copyWith(
-            scaffoldBackgroundColor: const Color(0xFF0B0C10),
-          ),
-          home: hasError
-              ? const Scaffold(
-                  body: Center(
-                    child: Text(
-                      'Amplify failed to initialize.',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                )
-              : const OnboardingScreen1(),
-        );
-      },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'In the Hood',
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: const Color(0xFF0B0C10),
+      ),
+      home: const OnboardingScreen1(),
     );
   }
 }

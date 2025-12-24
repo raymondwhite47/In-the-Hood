@@ -1,19 +1,27 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/business_ad_model.dart';
+import 'aws_store.dart';
 
 class AdsService {
-  final adsRef = FirebaseFirestore.instance.collection('business_ads');
+  final AwsStore _store = AwsStore.instance;
 
   Future<void> createAd(BusinessAdModel ad) async {
-    await adsRef.doc(ad.id).set(ad.toMap());
+    _store.set('business_ads', ad.id, ad.toMap());
   }
 
   Stream<List<BusinessAdModel>> getActiveAds() {
     final now = DateTime.now();
-    return adsRef
-        .where('startDate', isLessThanOrEqualTo: now.toIso8601String())
-        .where('endDate', isGreaterThanOrEqualTo: now.toIso8601String())
-        .snapshots()
-        .map((snap) => snap.docs.map((doc) => BusinessAdModel.fromMap(doc.data(), doc.id)).toList());
+    return _store.watch('business_ads').map((items) {
+      return items
+          .where((doc) {
+            final start = DateTime.tryParse(doc['startDate'] ?? '');
+            final end = DateTime.tryParse(doc['endDate'] ?? '');
+            if (start == null || end == null) {
+              return false;
+            }
+            return !start.isAfter(now) && !end.isBefore(now);
+          })
+          .map((doc) => BusinessAdModel.fromMap(doc, doc['id'] as String))
+          .toList();
+    });
   }
 }

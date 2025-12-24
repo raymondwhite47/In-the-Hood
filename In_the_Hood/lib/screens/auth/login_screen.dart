@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/auth_service.dart';
-import '../../services/firebase_service.dart';
+import '../../services/aws_auth_session.dart';
 import '../../widgets/custom_button.dart';
 import '../home/home_screen.dart';
 
@@ -19,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     setState(() => _loading = true);
-    final AuthService authService = AuthService(FirebaseService());
+    final AuthService authService = AuthService(AwsAuthSession.instance);
     await authService.login(_emailController.text, _passwordController.text);
     if (!mounted) return;
     setState(() => _loading = false);
