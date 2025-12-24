@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:in_the_hood/services/database_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:in_the_hood/services/aws_auth_session.dart';
 
 class CreateListingScreen extends StatefulWidget {
   const CreateListingScreen({super.key});
@@ -12,7 +12,7 @@ class CreateListingScreen extends StatefulWidget {
 class _CreateListingScreenState extends State<CreateListingScreen> {
   final DatabaseService _databaseService = DatabaseService();
   final _formKey = GlobalKey<FormState>();
-  final _auth = FirebaseAuth.instance;
+  final _authSession = AwsAuthSession.instance;
 
   String _title = '';
   String _description = '';
@@ -26,7 +26,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         description: _description,
         price: _price,
         imageUrl: _imageUrl,
-        userId: _auth.currentUser!.uid,
+        userId: _authSession.currentUserId ?? 'guest',
       );
     }
   }

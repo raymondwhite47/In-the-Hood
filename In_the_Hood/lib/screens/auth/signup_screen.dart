@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/auth_service.dart';
-import '../../services/firebase_service.dart';
+import '../../services/aws_auth_session.dart';
 import '../../widgets/custom_button.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Future<void> _signup() async {
     setState(() => _loading = true);
-    final AuthService authService = AuthService(FirebaseService());
+    final AuthService authService = AuthService(AwsAuthSession.instance);
     await authService.signup(_nameController.text, _emailController.text, _passwordController.text);
     if (!mounted) return;
     setState(() => _loading = false);
