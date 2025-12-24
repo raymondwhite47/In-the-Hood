@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -24,6 +21,19 @@ Future<void> _configureAmplify() async {
   final auth = AmplifyAuthCognito();
   final storage = AmplifyStorageS3();
 
+  try {
+    await Amplify.addPlugins([api, auth, storage]);
+    await Amplify.configure(amplifyconfig);
+  } on AmplifyAlreadyConfiguredException {
+    safePrint('Amplify was already configured.');
+  } catch (error) {
+    safePrint('Failed to configure Amplify: $error');
+  }
+}
+
+class InTheHoodApp extends StatefulWidget {
+  const InTheHoodApp({super.key});
+
   @override
   State<InTheHoodApp> createState() => _InTheHoodAppState();
 }
@@ -32,14 +42,36 @@ class _InTheHoodAppState extends State<InTheHoodApp> {
   late final Future<void> _amplifyInit;
 
   @override
+  void initState() {
+    super.initState();
+    _amplifyInit = _configureAmplify();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'In the Hood',
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0B0C10),
-      ),
-      home: const OnboardingScreen1(),
+    return FutureBuilder<void>(
+      future: _amplifyInit,
+      builder: (context, snapshot) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'In the Hood',
+          theme: ThemeData.dark().copyWith(
+            scaffoldBackgroundColor: const Color(0xFF0B0C10),
+          ),
+          home: snapshot.connectionState == ConnectionState.done
+              ? const OnboardingScreen1()
+              : const Scaffold(
+                  backgroundColor: Color(0xFF0B0C10),
+                  body: Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF00FFFF),
+                      ),
+                    ),
+                  ),
+                ),
+        );
+      },
     );
   }
 }
