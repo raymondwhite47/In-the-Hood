@@ -1,23 +1,26 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'aws_store.dart';
 
 class HoodCoinService {
-  final usersRef = FirebaseFirestore.instance.collection('users');
+  final AwsStore _store = AwsStore.instance;
 
   Future<void> addCoins(String userId, int amount) async {
-    await usersRef.doc(userId).update({'hoodCoins': FieldValue.increment(amount)});
+    final current = _store.get('users', userId)?['hoodCoins'] as int? ?? 0;
+    _store.update('users', userId, {'hoodCoins': current + amount});
   }
 
   Future<void> spendCoins(String userId, int amount) async {
-    final doc = await usersRef.doc(userId).get();
-    int current = doc['hoodCoins'] ?? 0;
+    final current = _store.get('users', userId)?['hoodCoins'] as int? ?? 0;
     if (current >= amount) {
-      await usersRef.doc(userId).update({'hoodCoins': current - amount});
+      _store.update('users', userId, {'hoodCoins': current - amount});
     } else {
       throw Exception("Not enough HoodCoins");
     }
   }
 
   Stream<int> watchBalance(String userId) {
-    return usersRef.doc(userId).snapshots().map((d) => (d.data()?['hoodCoins'] ?? 0) as int);
+    return _store.watch('users').map((items) {
+      final user = items.firstWhere((item) => item['id'] == userId, orElse: () => {});
+      return user['hoodCoins'] as int? ?? 0;
+    });
   }
 }

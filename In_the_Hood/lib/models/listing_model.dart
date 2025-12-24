@@ -1,4 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+class LocationPoint {
+  final double latitude;
+  final double longitude;
+
+  const LocationPoint({required this.latitude, required this.longitude});
+
+  Map<String, dynamic> toMap() => {'latitude': latitude, 'longitude': longitude};
+
+  factory LocationPoint.fromMap(Map<String, dynamic> data) {
+    return LocationPoint(
+      latitude: (data['latitude'] ?? 0).toDouble(),
+      longitude: (data['longitude'] ?? 0).toDouble(),
+    );
+  }
+}
 
 class Listing {
   final String id;
@@ -7,8 +21,8 @@ class Listing {
   final double price;
   final String imageUrl;
   final String userId;
-  final GeoPoint location;
-  final Timestamp createdAt;
+  final LocationPoint location;
+  final DateTime createdAt;
 
   Listing({
     required this.id,
@@ -28,26 +42,12 @@ class Listing {
         'price': price,
         'imageUrl': imageUrl,
         'userId': userId,
-        'location': location,
-        'createdAt': createdAt,
+        'location': location.toMap(),
+        'createdAt': createdAt.toIso8601String(),
       };
 
-
-  factory Listing.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map<String, dynamic>;
-    return Listing(
-      id: doc.id,
-      title: data['title'] ?? '',
-      description: data['description'] ?? '',
-      price: (data['price'] ?? 0).toDouble(),
-      imageUrl: data['imageUrl'] ?? '',
-      userId: data['userId'] ?? '',
-      location: data['location'] ?? GeoPoint(0, 0),
-      createdAt: data['createdAt'] ?? Timestamp.now(),
-    );
-  }
-
   factory Listing.fromMap(Map<String, dynamic> data, String documentId) {
+    final locationData = data['location'];
     return Listing(
       id: documentId,
       title: data['title'] ?? '',
@@ -55,8 +55,12 @@ class Listing {
       price: (data['price'] ?? 0).toDouble(),
       imageUrl: data['imageUrl'] ?? '',
       userId: data['userId'] ?? '',
-      location: data['location'] ?? GeoPoint(0, 0),
-      createdAt: data['createdAt'] ?? Timestamp.now(),
+      location: locationData is Map<String, dynamic>
+          ? LocationPoint.fromMap(locationData)
+          : const LocationPoint(latitude: 0, longitude: 0),
+      createdAt: data['createdAt'] != null
+          ? DateTime.parse(data['createdAt'])
+          : DateTime.now(),
     );
   }
 }

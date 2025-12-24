@@ -1,24 +1,25 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/auction_model.dart';
+import 'aws_store.dart';
 
 class AuctionService {
-  final CollectionReference auctionsRef = FirebaseFirestore.instance.collection('auctions');
+  final AwsStore _store = AwsStore.instance;
 
   Future<void> createAuction(AuctionModel auction) async {
-    await auctionsRef.doc(auction.id).set(auction.toMap());
+    _store.set('auctions', auction.id, auction.toMap());
   }
 
   Future<void> placeBid(String auctionId, double newBid, String userId) async {
-    await auctionsRef.doc(auctionId).update({
+    _store.update('auctions', auctionId, {
       'currentBid': newBid,
       'highestBidderId': userId,
     });
   }
 
   Stream<List<AuctionModel>> getActiveAuctions() {
-    return auctionsRef
-        .orderBy('endTime', descending: false)
-        .snapshots()
-        .map((snap) => snap.docs.map((doc) => AuctionModel.fromMap(doc.data() as Map<String, dynamic>)).toList());
+    return _store.watch('auctions').map((items) {
+      final auctions = items.map((doc) => AuctionModel.fromMap(doc)).toList();
+      auctions.sort((a, b) => a.endTime.compareTo(b.endTime));
+      return auctions;
+    });
   }
 }
