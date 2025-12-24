@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'amplifyconfiguration.dart';
-oid main() async {
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _configureAmplify();
   runApp(const InTheHoodApp());
 }
 
 Future<void> _configureAmplify() async {
+  if (Amplify.isConfigured) {
+    return;
+  }
+
   final api = AmplifyAPI();
   final auth = AmplifyAuthCognito();
   final storage = AmplifyStorageS3();
@@ -24,24 +28,6 @@ Future<void> _configureAmplify() async {
 
 class InTheHoodApp extends StatelessWidget {
   const InTheHoodApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'In the Hood',
-      theme: ThemeData.dark(),
-      home: const Scaffold(
-        body: Center(child: Text('Welcome to In the Hood')),
-      ),
-    );
-  }
-}
-void main() {
-  runApp(const InTheHood());
-}
-
-class InTheHood extends StatelessWidget {
-  const InTheHood({super.key});
 
   @override
   Widget build(BuildContext context) {
