@@ -1,0 +1,4 @@
+{
+    "emulator.androidColdBoot": true,
+    "emulator.emulatorPathWindows": "\"C:\\Android\\android-sdk\\tools\""
+}
