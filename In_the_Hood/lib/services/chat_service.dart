@@ -4,9 +4,23 @@ import '../models/chat_model.dart';
 import '../models/message_model.dart';
 
 class ChatService {
-  ChatService();
+  final Map<String, List<MessageModel>> _messagesByChat = {};
+  final Map<String, StreamController<List<MessageModel>>> _controllers = {};
 
-  final List<MessageModel> _messages = [];
+  String getChatId(String currentUserId, String otherUserId) {
+    final ids = [currentUserId, otherUserId]..sort();
+    return ids.join('_');
+  }
+
+  Stream<List<MessageModel>> getMessages(String chatId) {
+    return _controller(chatId).stream;
+  }
+
+  Future<void> sendMessage(String chatId, MessageModel message) async {
+    final messages = _messagesByChat.putIfAbsent(chatId, () => []);
+    messages.insert(0, message);
+    _notify(chatId);
+  }
 
   Future<List<ChatModel>> fetchChats() async {
     await Future<void>.delayed(const Duration(milliseconds: 250));
@@ -30,40 +44,40 @@ class ChatService {
 
   Future<List<MessageModel>> fetchMessages(String chatId) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
-    if (_messages.isNotEmpty) {
-      return _messages.where((message) => message.chatId == chatId).toList();
-    }
+    return _messagesByChat[chatId] ?? _seedMessages(chatId);
+  }
+
+  List<MessageModel> _seedMessages(String chatId) {
     return [
       MessageModel(
-        id: 'm1',
-        chatId: chatId,
-        sender: 'Alex',
+        senderId: 'alex',
+        receiverId: 'you',
         content: 'Hey neighbors!',
         timestamp: DateTime.now().subtract(const Duration(minutes: 10)),
       ),
       MessageModel(
-        id: 'm2',
-        chatId: chatId,
-        sender: 'You',
+        senderId: 'you',
+        receiverId: 'alex',
         content: 'Hi Alex, what’s up?',
         timestamp: DateTime.now().subtract(const Duration(minutes: 8)),
       ),
     ];
   }
 
-  Future<MessageModel> sendMessage({
-    required String chatId,
-    required String sender,
-    required String content,
-  }) async {
-    final message = MessageModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      chatId: chatId,
-      sender: sender,
-      content: content,
-      timestamp: DateTime.now(),
+  StreamController<List<MessageModel>> _controller(String chatId) {
+    return _controllers.putIfAbsent(
+      chatId,
+      () => StreamController<List<MessageModel>>.broadcast(
+        onListen: () => _notify(chatId),
+      ),
     );
-    _messages.add(message);
-    return message;
+  }
+
+  void _notify(String chatId) {
+    final controller = _controllers[chatId];
+    if (controller == null || controller.isClosed) {
+      return;
+    }
+    controller.add(List<MessageModel>.from(_messagesByChat[chatId] ?? []));
   }
 }

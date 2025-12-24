@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../services/chat_service.dart';
 import '../../models/message_model.dart';
 
@@ -67,7 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         senderId: widget.currentUserId,
                         receiverId: widget.otherUserId,
                         content: _msgCtrl.text.trim(),
-                        timestamp: Timestamp.now(),
+                        timestamp: DateTime.now(),
                       );
                       _chatService.sendMessage(chatId, message);
                       _msgCtrl.clear();
