@@ -1,1 +1,193 @@
-{}
+{
+  "models": {
+    "Neighborhood": {
+      "fields": {
+        "id": { "type": "ID", "isRequired": true },
+        "city": { "type": "String", "isRequired": true },
+        "name": { "type": "String", "isRequired": true },
+        "colorHex": { "type": "String" },
+        "centerLat": { "type": "Float" },
+        "centerLng": { "type": "Float" },
+        "boundaryGeoJson": { "type": "String" },
+        "posts": {
+          "type": "[Post]",
+          "association": { "connectionType": "HAS_MANY", "associatedWith": "neighborhoodID" }
+        },
+        "auctions": {
+          "type": "[Auction]",
+          "association": { "connectionType": "HAS_MANY", "associatedWith": "neighborhoodID" }
+        },
+        "communityPins": {
+          "type": "[CommunityPin]",
+          "association": { "connectionType": "HAS_MANY", "associatedWith": "neighborhoodID" }
+        },
+        "volunteerProjects": {
+          "type": "[VolunteerProject]",
+          "association": { "connectionType": "HAS_MANY", "associatedWith": "neighborhoodID" }
+        }
+      }
+    },
+    "UserProfile": {
+      "fields": {
+        "id": { "type": "ID", "isRequired": true },
+        "ownerSub": { "type": "String", "isRequired": true },
+        "displayName": { "type": "String", "isRequired": true },
+        "photoUrl": { "type": "String" },
+        "trustScore": { "type": "Int" },
+        "isVerified": { "type": "Boolean" },
+        "verificationStatus": { "type": "String" },
+        "homeNeighborhoodID": { "type": "ID" },
+        "homeNeighborhood": {
+          "type": "Neighborhood",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["homeNeighborhoodID"] }
+        },
+        "wallet": {
+          "type": "Wallet",
+          "association": { "connectionType": "HAS_ONE", "associatedWith": "userID" }
+        },
+        "posts": {
+          "type": "[Post]",
+          "association": { "connectionType": "HAS_MANY", "associatedWith": "authorID" }
+        },
+        "bids": {
+          "type": "[Bid]",
+          "association": { "connectionType": "HAS_MANY", "associatedWith": "bidderID" }
+        },
+        "auctions": {
+          "type": "[Auction]",
+          "association": { "connectionType": "HAS_MANY", "associatedWith": "sellerID" }
+        }
+      }
+    },
+    "Wallet": {
+      "fields": {
+        "id": { "type": "ID", "isRequired": true },
+        "userID": { "type": "ID", "isRequired": true },
+        "user": {
+          "type": "UserProfile",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["userID"] }
+        },
+        "hoodCoins": { "type": "Int" },
+        "bidCredits": { "type": "Int" }
+      }
+    },
+    "Post": {
+      "fields": {
+        "id": { "type": "ID", "isRequired": true },
+        "neighborhoodID": { "type": "ID", "isRequired": true },
+        "authorID": { "type": "ID", "isRequired": true },
+        "neighborhood": {
+          "type": "Neighborhood",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["neighborhoodID"] }
+        },
+        "author": {
+          "type": "UserProfile",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["authorID"] }
+        },
+        "type": { "type": "String" },
+        "title": { "type": "String" },
+        "body": { "type": "String" },
+        "imageUrls": { "type": "String" },
+        "status": { "type": "String" },
+        "aiScore": { "type": "Float" },
+        "createdAt": { "type": "AWSDateTime" },
+        "expiresAt": { "type": "AWSDateTime" }
+      }
+    },
+    "Auction": {
+      "fields": {
+        "id": { "type": "ID", "isRequired": true },
+        "neighborhoodID": { "type": "ID", "isRequired": true },
+        "sellerID": { "type": "ID", "isRequired": true },
+        "neighborhood": {
+          "type": "Neighborhood",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["neighborhoodID"] }
+        },
+        "seller": {
+          "type": "UserProfile",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["sellerID"] }
+        },
+        "title": { "type": "String", "isRequired": true },
+        "description": { "type": "String" },
+        "imageUrls": { "type": "String" },
+        "startPrice": { "type": "Int" },
+        "currentBid": { "type": "Int" },
+        "currentWinnerID": { "type": "ID" },
+        "bidIncrement": { "type": "Int" },
+        "startsAt": { "type": "AWSDateTime" },
+        "endsAt": { "type": "AWSDateTime" },
+        "status": { "type": "String" },
+        "isVerifiedOnly": { "type": "Boolean" },
+        "bids": {
+          "type": "[Bid]",
+          "association": { "connectionType": "HAS_MANY", "associatedWith": "auctionID" }
+        }
+      }
+    },
+    "Bid": {
+      "fields": {
+        "id": { "type": "ID", "isRequired": true },
+        "auctionID": { "type": "ID", "isRequired": true },
+        "bidderID": { "type": "ID", "isRequired": true },
+        "auction": {
+          "type": "Auction",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["auctionID"] }
+        },
+        "bidder": {
+          "type": "UserProfile",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["bidderID"] }
+        },
+        "amount": { "type": "Int", "isRequired": true },
+        "createdAt": { "type": "AWSDateTime" }
+      }
+    },
+    "CommunityPin": {
+      "fields": {
+        "id": { "type": "ID", "isRequired": true },
+        "neighborhoodID": { "type": "ID", "isRequired": true },
+        "createdByID": { "type": "ID", "isRequired": true },
+        "neighborhood": {
+          "type": "Neighborhood",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["neighborhoodID"] }
+        },
+        "creator": {
+          "type": "UserProfile",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["createdByID"] }
+        },
+        "pinType": { "type": "String" },
+        "title": { "type": "String" },
+        "description": { "type": "String" },
+        "address": { "type": "String" },
+        "lat": { "type": "Float" },
+        "lng": { "type": "Float" },
+        "phone": { "type": "String" },
+        "website": { "type": "String" },
+        "status": { "type": "String" }
+      }
+    },
+    "VolunteerProject": {
+      "fields": {
+        "id": { "type": "ID", "isRequired": true },
+        "neighborhoodID": { "type": "ID", "isRequired": true },
+        "organizerID": { "type": "ID", "isRequired": true },
+        "neighborhood": {
+          "type": "Neighborhood",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["neighborhoodID"] }
+        },
+        "organizer": {
+          "type": "UserProfile",
+          "association": { "connectionType": "BELONGS_TO", "targetNames": ["organizerID"] }
+        },
+        "title": { "type": "String", "isRequired": true },
+        "description": { "type": "String" },
+        "dateTime": { "type": "AWSDateTime" },
+        "locationText": { "type": "String" },
+        "lat": { "type": "Float" },
+        "lng": { "type": "Float" },
+        "slotsNeeded": { "type": "Int" },
+        "slotsFilled": { "type": "Int" },
+        "status": { "type": "String" }
+      }
+    }
+  }
+}
