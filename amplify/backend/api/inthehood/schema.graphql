@@ -1,0 +1,158 @@
+# -----------------------------------------------------------
+# In the Hood - AWS Amplify GraphQL Schema (Transformer v3)
+# -----------------------------------------------------------
+# Includes:
+# - Neighborhood feed (AI moderated)
+# - Auctions (FiveMiles-style, real-time)
+# - Community Love tab (volunteer + local aid)
+# - Wallet system (HoodCoins + bid credits)
+# -----------------------------------------------------------
+
+type Neighborhood
+  @model
+  @auth(rules: [{ allow: public }])
+{
+  id: ID!
+  city: String!
+  name: String!
+  colorHex: String
+  centerLat: Float
+  centerLng: Float
+  boundaryGeoJson: String
+  posts: [Post] @hasMany(indexName: "byNeighborhood", fields: ["id"])
+  auctions: [Auction] @hasMany(indexName: "byNeighborhood", fields: ["id"])
+  communityPins: [CommunityPin] @hasMany(indexName: "byNeighborhood", fields: ["id"])
+  volunteerProjects: [VolunteerProject] @hasMany(indexName: "byNeighborhood", fields: ["id"])
+}
+
+type UserProfile
+  @model
+  @auth(rules: [{ allow: owner }])
+{
+  id: ID!
+  ownerSub: String!
+  displayName: String!
+  photoUrl: String
+  trustScore: Int
+  isVerified: Boolean
+  verificationStatus: String
+  homeNeighborhoodID: ID
+  homeNeighborhood: Neighborhood @belongsTo(fields: ["homeNeighborhoodID"])
+  wallet: Wallet @hasOne
+  posts: [Post] @hasMany(indexName: "byAuthor", fields: ["id"])
+  bids: [Bid] @hasMany(indexName: "byBidder", fields: ["id"])
+  auctions: [Auction] @hasMany(indexName: "bySeller", fields: ["id"])
+}
+
+type Wallet
+  @model
+  @auth(rules: [{ allow: owner }])
+{
+  id: ID!
+  userID: ID! @index(name: "byUser", sortKeyFields: ["id"])
+  user: UserProfile @belongsTo(fields: ["userID"])
+  hoodCoins: Int
+  bidCredits: Int
+}
+
+type Post
+  @model
+  @auth(rules: [{ allow: public }])
+  @index(name: "byNeighborhood", fields: ["neighborhoodID", "createdAt"], queryField: "postsByNeighborhood")
+{
+  id: ID!
+  neighborhoodID: ID! @index(name: "byNeighborhood")
+  authorID: ID!
+  neighborhood: Neighborhood @belongsTo(fields: ["neighborhoodID"])
+  author: UserProfile @belongsTo(fields: ["authorID"])
+  type: String
+  title: String
+  body: String
+  imageUrls: String
+  status: String
+  aiScore: Float
+  createdAt: AWSDateTime
+  expiresAt: AWSDateTime
+}
+
+type Auction
+  @model
+  @auth(rules: [{ allow: public }])
+  @index(name: "byNeighborhood", fields: ["neighborhoodID", "endsAt"], queryField: "auctionsByNeighborhood")
+  @index(name: "bySeller", fields: ["sellerID"], queryField: "auctionsBySeller")
+{
+  id: ID!
+  neighborhoodID: ID!
+  sellerID: ID!
+  neighborhood: Neighborhood @belongsTo(fields: ["neighborhoodID"])
+  seller: UserProfile @belongsTo(fields: ["sellerID"])
+  title: String!
+  description: String
+  imageUrls: String
+  startPrice: Int
+  currentBid: Int
+  currentWinnerID: ID
+  bidIncrement: Int
+  startsAt: AWSDateTime
+  endsAt: AWSDateTime
+  status: String
+  isVerifiedOnly: Boolean
+  bids: [Bid] @hasMany(indexName: "byAuction", fields: ["id"])
+}
+
+type Bid
+  @model
+  @auth(rules: [{ allow: public }])
+  @index(name: "byAuction", fields: ["auctionID", "createdAt"], queryField: "bidsByAuction")
+  @index(name: "byBidder", fields: ["bidderID"], queryField: "bidsByBidder")
+{
+  id: ID!
+  auctionID: ID! @index(name: "byAuction")
+  bidderID: ID!
+  auction: Auction @belongsTo(fields: ["auctionID"])
+  bidder: UserProfile @belongsTo(fields: ["bidderID"])
+  amount: Int!
+  createdAt: AWSDateTime
+}
+
+type CommunityPin
+  @model
+  @auth(rules: [{ allow: public }])
+  @index(name: "byNeighborhood", fields: ["neighborhoodID"], queryField: "pinsByNeighborhood")
+{
+  id: ID!
+  neighborhoodID: ID!
+  createdByID: ID!
+  neighborhood: Neighborhood @belongsTo(fields: ["neighborhoodID"])
+  creator: UserProfile @belongsTo(fields: ["createdByID"])
+  pinType: String
+  title: String
+  description: String
+  address: String
+  lat: Float
+  lng: Float
+  phone: String
+  website: String
+  status: String
+}
+
+type VolunteerProject
+  @model
+  @auth(rules: [{ allow: public }])
+  @index(name: "byNeighborhood", fields: ["neighborhoodID"], queryField: "projectsByNeighborhood")
+{
+  id: ID!
+  neighborhoodID: ID!
+  organizerID: ID!
+  neighborhood: Neighborhood @belongsTo(fields: ["neighborhoodID"])
+  organizer: UserProfile @belongsTo(fields: ["organizerID"])
+  title: String!
+  description: String
+  dateTime: AWSDateTime
+  locationText: String
+  lat: Float
+  lng: Float
+  slotsNeeded: Int
+  slotsFilled: Int
+  status: String
+}
