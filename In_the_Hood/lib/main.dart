@@ -125,10 +125,20 @@ class OnboardingScreen1 extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 80),
-              const Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.cyanAccent,
-                size: 32,
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OnboardingScreen2(),
+                    ),
+                  );
+                },
+                child: const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.cyanAccent,
+                  size: 32,
+                ),
               ),
             ],
           ),
