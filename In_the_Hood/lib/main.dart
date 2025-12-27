@@ -245,18 +245,290 @@ class OnboardingScreen2 extends StatelessWidget {
 
 // === HOME PLACEHOLDER ===
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _isSignedIn = false;
+  bool _isSignUpComplete = false;
+  bool _isLoading = false;
+  String _statusMessage = '';
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _phoneController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _signUp() async {
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    final userAttributes = <CognitoUserAttributeKey, String>{};
+    if (email.isNotEmpty) {
+      userAttributes[CognitoUserAttributeKey.email] = email;
+    }
+    if (phone.isNotEmpty) {
+      userAttributes[CognitoUserAttributeKey.phoneNumber] = phone;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _statusMessage = '';
+    });
+
+    try {
+      final res = await Amplify.Auth.signUp(
+        username: username,
+        password: password,
+        options: CognitoSignUpOptions(userAttributes: userAttributes),
+      );
+      setState(() {
+        _isSignUpComplete = res.isSignUpComplete;
+        _statusMessage = res.isSignUpComplete
+            ? 'Sign up complete. You can sign in.'
+            : 'Sign up initiated. Check your email/SMS to confirm.';
+      });
+    } on AuthException catch (e) {
+      setState(() {
+        _statusMessage = 'Sign up failed: ${e.message}';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _signIn() async {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    setState(() {
+      _isLoading = true;
+      _statusMessage = '';
+    });
+
+    try {
+      final res = await Amplify.Auth.signIn(
+        username: username,
+        password: password,
+      );
+      setState(() {
+        _isSignedIn = res.isSignedIn;
+        _statusMessage =
+            res.isSignedIn ? 'Signed in.' : 'Additional steps required.';
+      });
+    } on AuthException catch (e) {
+      setState(() {
+        _statusMessage = 'Sign in failed: ${e.message}';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _signOut() async {
+    setState(() {
+      _isLoading = true;
+      _statusMessage = '';
+    });
+
+    try {
+      await Amplify.Auth.signOut();
+      setState(() {
+        _isSignedIn = false;
+        _statusMessage = 'Signed out.';
+      });
+    } on AuthException catch (e) {
+      setState(() {
+        _statusMessage = 'Sign out failed: ${e.message}';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF0B0C10),
-      body: Center(
-        child: Text(
-          'Welcome to In the Hood',
-          style: TextStyle(color: Colors.white, fontSize: 22),
+    return Scaffold(
+      backgroundColor: const Color(0xFF0B0C10),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Welcome to In the Hood',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.orbitron(
+                  fontSize: 24,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Create an account or sign in to continue.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(color: Colors.white70),
+              ),
+              const SizedBox(height: 32),
+              _buildInputField(
+                label: 'Email',
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 16),
+              _buildInputField(
+                label: 'Phone Number',
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 16),
+              _buildInputField(
+                label: 'Username',
+                controller: _usernameController,
+              ),
+              const SizedBox(height: 16),
+              _buildInputField(
+                label: 'Password',
+                controller: _passwordController,
+                isPassword: true,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _signUp,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00FFFF),
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text(
+                  _isLoading ? 'Working...' : 'Sign Up',
+                  style: GoogleFonts.orbitron(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _signIn,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white10,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text(
+                  _isLoading ? 'Working...' : 'Sign In',
+                  style: GoogleFonts.orbitron(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: _isLoading ? null : _signOut,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                  side: const BorderSide(color: Colors.white30),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text(
+                  _isLoading ? 'Working...' : 'Sign Out',
+                  style: GoogleFonts.orbitron(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildStatusCard(),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInputField({
+    required String label,
+    required TextEditingController controller,
+    TextInputType? keyboardType,
+    bool isPassword = false,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: isPassword,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.white24),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF00FFFF)),
+        ),
+        filled: true,
+        fillColor: Colors.white10,
+      ),
+    );
+  }
+
+  Widget _buildStatusCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white10,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white24),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Status',
+            style: GoogleFonts.orbitron(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _statusMessage.isEmpty
+                ? 'No activity yet.'
+                : _statusMessage,
+            style: GoogleFonts.inter(color: Colors.white70),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _isSignedIn ? 'Signed in' : 'Signed out',
+            style: GoogleFonts.inter(
+              color: _isSignedIn ? Colors.greenAccent : Colors.redAccent,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _isSignUpComplete ? 'Sign up complete' : 'Sign up incomplete',
+            style: GoogleFonts.inter(color: Colors.white70),
+          ),
+        ],
       ),
     );
   }
