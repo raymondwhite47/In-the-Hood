@@ -13,7 +13,7 @@ This document captures the current AWS/Amplify footprint in the repo, the enviro
 | **DynamoDB (via AppSync)** | Implicit from GraphQL models in `schema.graphql` | Tables are generated when the API is deployed. |
 | **Cognito** | Not present in `amplify/backend/auth` | No Auth category configured in this repo yet. |
 | **S3 Storage** | Not present in `amplify/backend/storage` | No Storage category configured in this repo yet. |
-| **API Gateway / Lambda** | No `amplify/backend/function` or API Gateway config | No Lambda or API Gateway resources configured. |
+| **API Gateway / Lambda** | `amplify/backend/function/inthehoodProcessAuction` | Lambda function is configured for auction processing (no API Gateway configured). |
 
 **Environment map (from `amplify/team-provider-info.json`)**
 
@@ -120,3 +120,29 @@ amplify pull --envName prod
 3. **Pull config** for each environment to update `In_the_Hood/lib/amplifyconfiguration.dart`.
 4. **Record environment values** in your internal secrets store or Parameter Store.
 5. **Update CI** to deploy based on branch → environment mapping (e.g., `main` → `prod`, `develop` → `dev`).
+
+## 6) Direct DynamoDB access in Lambda (AWS SDK)
+
+If you want to read/write DynamoDB directly inside a Lambda (for example, `inthehoodProcessAuction`), use the AWS SDK DocumentClient and reference the table name from environment variables set by Amplify.
+
+**Node.js example:**
+
+```js
+const AWS = require("aws-sdk");
+const ddb = new AWS.DynamoDB.DocumentClient();
+
+exports.handler = async () => {
+  const params = {
+    TableName: process.env.AUCTION_TABLE_NAME, // provided by Amplify
+    Key: { id: "auction1" },
+  };
+
+  const result = await ddb.get(params).promise();
+  console.log("Auction:", result.Item);
+  return result.Item;
+};
+```
+
+**Notes:**
+- Amplify model tables are created per environment and generally follow `Auction-<environmentId>`, `Post-<environmentId>`, etc.
+- You can confirm the exact table names in the AWS Console under **DynamoDB → Tables**.
