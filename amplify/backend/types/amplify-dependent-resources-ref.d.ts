@@ -1,9 +1,9 @@
 export type AmplifyDependentResourcesAttributes = {
-  function: {
-    inthehoodProcessAuction: {
-      Arn: string
-      Name: string
-      Region: string
+  "function": {
+    "inthehoodProcessAuction": {
+      "Name": string,
+      "Arn": string,
+      "Region": string
     }
   }
 }

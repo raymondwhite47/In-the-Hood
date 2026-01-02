@@ -1,4 +1,11 @@
 {
+  "function": {
+    "inthehoodProcessAuction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
   "models": {
     "Neighborhood": {
       "fields": {
@@ -62,6 +69,7 @@
     "Wallet": {
       "fields": {
         "id": { "type": "ID", "isRequired": true },
+        "ownerSub": { "type": "String", "isRequired": true },
         "userID": { "type": "ID", "isRequired": true },
         "user": {
           "type": "UserProfile",

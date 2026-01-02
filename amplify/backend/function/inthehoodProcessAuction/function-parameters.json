@@ -1,13 +1,4 @@
 {
-  "permissions": {
-    "storage": {
-      "inthehoodapi": ["create", "read", "update", "delete"]
-    }
-  },
-  "environmentVariableList": [
-    {
-      "cloudFormationParameterName": "tableName",
-      "environmentVariableName": "TABLE_NAME"
-    }
-  ]
+  "permissions": {},
+  "runtime": "nodejs18.x"
 }
