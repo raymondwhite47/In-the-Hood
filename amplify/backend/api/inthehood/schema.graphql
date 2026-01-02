@@ -27,10 +27,20 @@ type Neighborhood
 
 type UserProfile
   @model
-  @auth(rules: [{ allow: owner }])
+  @auth(rules: [{ allow: owner, ownerField: "ownerSub", identityClaim: "sub" }])
 {
   id: ID!
   ownerSub: String!
+    @auth(
+      rules: [
+        {
+          allow: owner
+          ownerField: "ownerSub"
+          identityClaim: "sub"
+          operations: [create, read]
+        }
+      ]
+    )
   displayName: String!
   photoUrl: String
   trustScore: Int
@@ -46,9 +56,20 @@ type UserProfile
 
 type Wallet
   @model
-  @auth(rules: [{ allow: owner }])
+  @auth(rules: [{ allow: owner, ownerField: "ownerSub", identityClaim: "sub" }])
 {
   id: ID!
+  ownerSub: String!
+    @auth(
+      rules: [
+        {
+          allow: owner
+          ownerField: "ownerSub"
+          identityClaim: "sub"
+          operations: [create, read]
+        }
+      ]
+    )
   userID: ID! @index(name: "byUser", sortKeyFields: ["id"])
   user: UserProfile @belongsTo(fields: ["userID"])
   hoodCoins: Int
