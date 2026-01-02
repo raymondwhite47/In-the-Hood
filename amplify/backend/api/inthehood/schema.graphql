@@ -76,7 +76,7 @@ type Post
 }
 
 type Auction
-  @model
+  @model(mutations: { create: "createAuction", update: null, delete: "deleteAuction" })
   @auth(rules: [{ allow: public }])
   @index(name: "byNeighborhood", fields: ["neighborhoodID", "endsAt"], queryField: "auctionsByNeighborhood")
   @index(name: "bySeller", fields: ["sellerID"], queryField: "auctionsBySeller")
@@ -98,6 +98,28 @@ type Auction
   status: String
   isVerifiedOnly: Boolean
   bids: [Bid] @hasMany(indexName: "byAuction", fields: ["id"])
+}
+
+input UpdateAuctionInput {
+  id: ID!
+  neighborhoodID: ID
+  sellerID: ID
+  title: String
+  description: String
+  imageUrls: String
+  startPrice: Int
+  currentBid: Int
+  currentWinnerID: ID
+  bidIncrement: Int
+  startsAt: AWSDateTime
+  endsAt: AWSDateTime
+  status: String
+  isVerifiedOnly: Boolean
+}
+
+type Mutation {
+  updateAuction(input: UpdateAuctionInput!): Auction
+    @function(name: "inthehoodProcessAuction-${env}")
 }
 
 type Bid

@@ -1,4 +1,11 @@
 {
+  "function": {
+    "inthehoodProcessAuction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
   "models": {
     "Neighborhood": {
       "fields": {
