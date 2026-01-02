@@ -189,5 +189,12 @@
         "status": { "type": "String" }
       }
     }
+  },
+  "function": {
+    "inthehoodProcessAuction": {
+      "service": "Lambda",
+      "providerPlugin": "awscloudformation",
+      "build": true
+    }
   }
 }
